@@ -2,6 +2,7 @@ const express = require('express');
 const PORT = process.env.PORT || 3001;
 const knex = require('./knex/knex.js');
 const cors = require('cors')
+<<<<<<< HEAD
 const app = express();
 
 
@@ -10,6 +11,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
+=======
+>>>>>>> 6533765650bcec7038731d8610bb1547553bdc94
 /**
  * Config multer
  */
@@ -29,11 +32,13 @@ const upload = multer({
         }
     })
 })
-
-/**
- * Configura las CORS
- */
+const app = express();
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(cors())
+
+
 
 /**
  * Arrancan endpoints
@@ -74,12 +79,17 @@ app.get(
 
 app.post(
     '/punto_muestral/:celular',
+<<<<<<< HEAD
     (req, res) => 
+=======
+    (req, res) =>
+>>>>>>> 6533765650bcec7038731d8610bb1547553bdc94
         knex('punto_muestral')
             .update('registro_ingreso', req.body.registroIngreso)
             .update('horapresencia', knex.raw('GETDATE()'))
             .where('celular', req.params.celular)
             .then(
+<<<<<<< HEAD
                 resp => res.send({ 
                     status: 'Ok',
                     body: 'Presencia reportada correctamente'
@@ -92,6 +102,20 @@ app.post(
                 })
             )
     
+=======
+                resp => res.send({
+                    status: 'Ok',
+                    body: 'Presencia reportada correctamente'
+                })
+            )
+            .catch(
+                err => res.status(404).send({
+                    status: 'Error',
+                    body: err
+                })
+            )
+
+>>>>>>> 6533765650bcec7038731d8610bb1547553bdc94
 );
 
 
@@ -231,12 +255,27 @@ app.post(
 
 app.get(
     '/resultados/:idCategoria/:idMesa',
+<<<<<<< HEAD
     (req, res) =>
         knex.raw(`calculaProyeccion ${req.params.idCategoria}, ${req.params.idMesa}`).then(function(result) {
+=======
+    (req, res) =>
+        knex.raw(`calculaProyeccion ${req.params.idCategoria}, ${req.params.idMesa}`).then(function (result) {
             res.send(result)
         })
 );
 
+
+app.get(
+    '/puntos-informados/:idCategoria',
+    (req, res) =>
+        knex.raw(`puntosInformadosTotal ${req.params.idCategoria}`).then(function (result) {
+>>>>>>> 6533765650bcec7038731d8610bb1547553bdc94
+            res.send(result)
+        })
+);
+
+<<<<<<< HEAD
 
 app.get(
     '/puntos-informados/:idCategoria',
@@ -260,6 +299,41 @@ app.get(
                 res.status(404).send(err)
             })
     }
+=======
+app.get(
+    '/admin-sp/:spName',
+    (req, res) => {
+        console.log(req.params.spName);
+
+
+        knex.raw(`${req.params.spName}`)
+            .then(function (result) {
+                res.send(result)
+            })
+            .catch(function (err) {
+                res.status(404).send(err)
+            })
+    }
+);
+
+
+app.get(
+    '/localidad',
+    (req, res) => knex('punto_muestral')
+        .select('localidad')
+        .distinct()
+        .whereNotNull('localidad')
+        .then(
+            resp => res.send(resp.map(e => e.localidad))
+        )
+        .catch(
+            err => {
+                console.log('ERROR')
+                console.log(err)
+            }
+        )
+
+>>>>>>> 6533765650bcec7038731d8610bb1547553bdc94
 );
 
 
