@@ -68,24 +68,24 @@ app.get(
 
 app.post(
     '/punto_muestral/:celular',
-    (req, res) => 
+    (req, res) =>
         knex('punto_muestral')
             .update('registro_ingreso', req.body.registroIngreso)
             .update('horapresencia', knex.raw('GETDATE()'))
             .where('celular', req.params.celular)
             .then(
-                resp => res.send({ 
+                resp => res.send({
                     status: 'Ok',
                     body: 'Presencia reportada correctamente'
                 })
             )
             .catch(
-                err => res.status(404).send({ 
+                err => res.status(404).send({
                     status: 'Error',
                     body: err
                 })
             )
-    
+
 );
 
 
@@ -226,7 +226,7 @@ app.post(
 app.get(
     '/resultados/:idCategoria/:idMesa',
     (req, res) =>
-        knex.raw(`calculaProyeccion ${req.params.idCategoria}, ${req.params.idMesa}`).then(function(result) {
+        knex.raw(`calculaProyeccion ${req.params.idCategoria}, ${req.params.idMesa}`).then(function (result) {
             res.send(result)
         })
 );
@@ -235,25 +235,44 @@ app.get(
 app.get(
     '/puntos-informados/:idCategoria',
     (req, res) =>
-        knex.raw(`puntosInformadosTotal ${req.params.idCategoria}`).then(function(result) {
+        knex.raw(`puntosInformadosTotal ${req.params.idCategoria}`).then(function (result) {
             res.send(result)
         })
 );
 
 app.get(
     '/admin-sp/:spName',
-    (req, res) => { 
+    (req, res) => {
         console.log(req.params.spName);
 
-        
+
         knex.raw(`${req.params.spName}`)
-            .then(function(result) {
+            .then(function (result) {
                 res.send(result)
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 res.status(404).send(err)
             })
     }
+);
+
+
+app.get(
+    '/localidad',
+    (req, res) => knex('punto_muestral')
+        .select('localidad')
+        .distinct()
+        .whereNotNull('localidad')
+        .then(
+            resp => res.send(resp.map(e => e.localidad))
+        )
+        .catch(
+            err => {
+                console.log('ERROR')
+                console.log(err)
+            }
+        )
+
 );
 
 
