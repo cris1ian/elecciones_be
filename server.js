@@ -2,17 +2,13 @@ const express = require('express');
 const PORT = process.env.PORT || 3001;
 const knex = require('./knex/knex.js');
 const cors = require('cors')
-<<<<<<< HEAD
 const app = express();
-
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cors())
 
-
-=======
->>>>>>> 6533765650bcec7038731d8610bb1547553bdc94
 /**
  * Config multer
  */
@@ -32,12 +28,6 @@ const upload = multer({
         }
     })
 })
-const app = express();
-const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(cors())
-
 
 
 /**
@@ -79,17 +69,12 @@ app.get(
 
 app.post(
     '/punto_muestral/:celular',
-<<<<<<< HEAD
     (req, res) =>
-=======
-    (req, res) =>
->>>>>>> 6533765650bcec7038731d8610bb1547553bdc94
         knex('punto_muestral')
             .update('registro_ingreso', req.body.registroIngreso)
             .update('horapresencia', knex.raw('GETDATE()'))
             .where('celular', req.params.celular)
             .then(
-<<<<<<< HEAD
                 resp => res.send({
                     status: 'Ok',
                     body: 'Presencia reportada correctamente'
@@ -102,20 +87,6 @@ app.post(
                 })
             )
 
-=======
-                resp => res.send({
-                    status: 'Ok',
-                    body: 'Presencia reportada correctamente'
-                })
-            )
-            .catch(
-                err => res.status(404).send({
-                    status: 'Error',
-                    body: err
-                })
-            )
-
->>>>>>> 6533765650bcec7038731d8610bb1547553bdc94
 );
 
 
