@@ -4,8 +4,10 @@ const knex = require('./knex/knex.js');
 const cors = require('cors')
 const app = express();
 
-const candidatosNombres = require('./constants/candidatosNombres').default;
-const reglas = require('./constants/reglas').default;
+
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 
 /**
@@ -50,6 +52,13 @@ app.get(
                 .then(
                     resp => res.send(resp)
                 )
+                .catch(
+                    err => {
+                        console.log('Celular:' + celular);
+                        console.log('ERROR')
+                        console.log(err)
+                    }
+                )
 
         } else {
             return knex('mesa').select('*')
@@ -62,35 +71,35 @@ app.get(
 );
 
 
+
+app.post(
+    '/punto_muestral/:celular',
+    (req, res) => 
+        knex('punto_muestral')
+            .update('registro_ingreso', req.body.registroIngreso)
+            .update('horapresencia', knex.raw('GETDATE()'))
+            .where('celular', req.params.celular)
+            .then(
+                resp => res.send({ 
+                    status: 'Ok',
+                    body: 'Presencia reportada correctamente'
+                })
+            )
+            .catch(
+                err => res.status(404).send({ 
+                    status: 'Error',
+                    body: err
+                })
+            )
+    
+);
+
+
 app.get(
     '/punto_muestral/:idPuntoMuestral/mesas',
     (req, res) =>
         knex('mesa').select('*')
             .where('idpuntomuestral', req.params.idPuntoMuestral)
-            .then(
-                resp => res.send(resp)
-            )
-);
-
-/**
- * Retorna TODAS las categorias
- */
-app.get(
-    '/categorias',
-    (req, res) =>
-        knex('categoria').select('*')
-            .then(
-                resp => res.send(resp)
-            )
-);
-
-/**
- * Retorna TODOS las mesas
- */
-app.get(
-    '/mesas',
-    (req, res) =>
-        knex('mesa').select('*')
             .then(
                 resp => res.send(resp)
             )
@@ -130,6 +139,33 @@ app.get(
             )
 );
 
+
+/**
+ * Retorna TODAS las categorias
+ */
+app.get(
+    '/categorias',
+    (req, res) =>
+        knex('categoria').select('*')
+            .then(
+                resp => res.send(resp)
+            )
+);
+
+/**
+ * Retorna TODOS las mesas
+ */
+app.get(
+    '/mesas',
+    (req, res) =>
+        knex('mesa').select('*')
+            .then(
+                resp => res.send(resp)
+            )
+);
+
+
+
 app.get(
     '/categoria/:idCategoria/candidatos',
     (req, res) =>
@@ -148,8 +184,10 @@ app.post(
         // Primero checkeo que se suba bien la foto. Caso contrario cancelo todo
         upload.single('attachment')(req, res, function (err) {
             if (err instanceof multer.MulterError) {
+                console.log(err)
                 return res.status('404'.send(err))
             } else if (err) {
+                console.log(err)
                 return res.status('500'.send(err))
             }
 
@@ -157,30 +195,6 @@ app.post(
              * Mapeo el body a un array de promises (todos los insert a la db) que despues resuelvo todos juntos
              */
             const mesasCandidatos = JSON.parse(req.body['mesasCandidatos']);
-
-            // RN: Candidato total votos tiene que ser menor o igual a 350
-            const candidatoTotalVotos = mesasCandidatos.find(mc => mc.candidato.nombre === candidatosNombres.TOTAL_VOTOS);
-            if (candidatoTotalVotos.cantidadVotos > reglas.MAX_VOTOS) {
-                res.status('404').send({
-                    status: 'error',
-                    body: `Total Votos supera la cantidad máxima permitida: ${reglas.MAX_VOTOS}`
-                })
-            }
-
-            // RN: Sumatoria cnadidatos exceptuando total votos tiene que ser menor o igual a 350
-            const sumTotalVotos = mesasCandidatos
-                .filter(mc => mc.candidato.nombre !== candidatosNombres.TOTAL_VOTOS)
-                .reduce(
-                    (acc, mc) => acc + Number(mc.cantidadVotos),
-                    0
-                )
-
-            if (sumTotalVotos > reglas.MAX_VOTOS) {
-                res.status('404').send({
-                    status: 'error',
-                    body: `La suma de los votos de cada candidato supera la cantidad máxima permitida: ${reglas.MAX_VOTOS}`
-                })
-            }
 
             const mesasCandidatosPromises = mesasCandidatos
                 .map(
@@ -216,33 +230,38 @@ app.post(
 
 
 app.get(
-    '/resultados',
+    '/resultados/:idCategoria/:idMesa',
     (req, res) =>
-        knex.raw('calculaProyeccion').then(function(result) {
-            // console.dir(result, {depth: null})
-            // console.log(result)
+        knex.raw(`calculaProyeccion ${req.params.idCategoria}, ${req.params.idMesa}`).then(function(result) {
             res.send(result)
         })
-
-
-        // knex('mesa_candidato').select('urlimagen', 'nombre', 'cantidadvotos')
-        //     .join('candidato', 'candidato.id', 'mesa_candidato.idcandidato')
-        //     .join('mesa', 'mesa.id', 'mesa_candidato.idcandidato')
-        //     .then(
-        //         resp => res.send(
-        //             resp.map(
-        //                 r => ({
-        //                     categoriaDescripcion: 'Gobernador',
-        //                     candidatoNombre: 'Bonfatti',
-        //                     contados: 1500,
-        //                     proyectados: 60120,
-        //                     porcentaje: 20,
-        //                     urlImagen: 'https://upload.wikimedia.org/wikipedia/commons/8/8b/Antonio_Bonfatti_2019.png'
-        //                 })
-        //             )
-        //         )
-        //     )
 );
+
+
+app.get(
+    '/puntos-informados/:idCategoria',
+    (req, res) =>
+        knex.raw(`puntosInformadosTotal ${req.params.idCategoria}`).then(function(result) {
+            res.send(result)
+        })
+);
+
+app.get(
+    '/admin-sp/:spName',
+    (req, res) => { 
+        console.log(req.params.spName);
+
+        
+        knex.raw(`${req.params.spName}`)
+            .then(function(result) {
+                res.send(result)
+            })
+            .catch(function(err) {
+                res.status(404).send(err)
+            })
+    }
+);
+
 
 /**
  * Fin endpoints
