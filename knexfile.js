@@ -1,17 +1,19 @@
 module.exports = {
     development: {
-        client: 'mssql',
+        client: "mssql",
         connection: {
-            host: 'localhost',
-            user: 'SA',
-            password: 'Alberdi11',
-            database: 'elecciones_db'
+            host: "localhost",
+            host: "www.kernelinformatica.com.ar",
+            port: 14335,
+            user: "SA",
+            password: "Alberdi11",
+            database: "elecciones_db",
         },
         migrations: {
-            directory: __dirname + '/knex/migrations',
+            directory: __dirname + "/knex/migrations",
         },
         seeds: {
-            directory: __dirname + '/knex/seeds'
-        }
-    }
-  }
+            directory: __dirname + "/knex/seeds",
+        },
+    },
+};

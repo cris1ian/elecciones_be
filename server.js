@@ -144,7 +144,8 @@ app.get(
         knex('categoria').select('*')
             .then(
                 resp => res.send(resp)
-            )
+            ).catch( err => res.status(500).send(err)),
+    
 );
 
 /**
