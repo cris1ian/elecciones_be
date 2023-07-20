@@ -21,7 +21,7 @@ module.exports = {
         client: "mssql",
         connection: {
             host: "localhost",
-            port: 14335,
+            port: 1433,
             user: "SA",
             password: "Alberdi11",
             database: "elecciones_db",

@@ -16,13 +16,14 @@ app.use(cors())
 require('./src/routes')(app);
 
 const shouldUseHttps = process.env.NODE_ENV == "production";
-const domain = "www.mesastesti.com.ar"
+const path = "/home/administrador/cert-mesas/";
+const domain = "www.mesastesti.com.ar";
 
 if (shouldUseHttps) {
     const options = {
-        key: fs.readFileSync(`/etc/letsencrypt/live/${domain}/privkey.pem`),
-        cert: fs.readFileSync(`/etc/letsencrypt/live/${domain}/fullchain.pem`),
-        ca: fs.readFileSync(`/etc/letsencrypt/live/${domain}/chain.pem`),
+        key: fs.readFileSync(`${path}privkey.pem`),
+        cert: fs.readFileSync(`${path}fullchain.pem`),
+        ca: fs.readFileSync(`${path}chain.pem`),
     };
 
     https.createServer(options, app).listen(PORT, function () {
