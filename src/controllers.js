@@ -1,61 +1,5 @@
 const knex = require("./knex/knex.js");
 
-// const responseUtils = require("../utils/response-utils");
-// const knex = require("../config/knex-config");
-// const parseQueryBool = require("../utils/auth-utils").parseQueryBool;
-
-// const table = "holiday";
-// const defaultOrderBy = "date";
-// const paginationSize = 1000;
-
-// exports.delete = async (req, res) => {
-//     console.log(`\n${table}.delete()`);
-//     console.log(req.body);
-//     console.log(req.query);
-//     console.log(req.params);
-
-//     /** Chequear que no falte ningun campo obligatorio */
-//     if (!req.params.id) {
-//         return res
-//             .status(400)
-//             .send(responseUtils.getErrorResponse("Se requiere campo id"));
-//     }
-
-//     query = knex(table).delete().where({ id: req.params.id });
-//     console.log(query.toString());
-
-//     try {
-//         queryResolve = await query;
-//         console.log(queryResolve);
-
-//         if (queryResolve && queryResolve > 0)
-//             return res.send(
-//                 responseUtils.getSuccessResponse(
-//                     `Borrados ${queryResolve} registros`,
-//                     "Delete Ok"
-//                 )
-//             );
-//         return res
-//             .status(404)
-//             .send(
-//                 responseUtils.getErrorResponse(
-//                     `El id ${req.params.id} no produjo resultados`
-//                 )
-//             );
-//     } catch (error) {
-//         console.log("ERROR:", error);
-//         if (error && error.errno == 1451)
-//             return res
-//                 .status(423)
-//                 .send(responseUtils.getErrorResponse("Bloqueado", error));
-//         return res
-//             .status(500)
-//             .send(
-//                 responseUtils.getErrorResponse("Error en el servidor", error)
-//             );
-//     }
-// };
-
 /**
  * Config multer
  */
@@ -171,6 +115,7 @@ exports.getPuntoMuestralByIdMesa = (req, res) => {
 exports.getCategorias = (req, res) => {
     return knex("categoria")
         .select("*")
+        .orderBy("ordenCategoria","asc")
         .then((resp) => res.send(resp))
         .catch((err) => res.status(500).send(err));
 };
@@ -187,6 +132,7 @@ exports.getMesas = (req, res) => {
 exports.getCategoriaById = (req, res) => {
     return knex("candidato")
         .select("*")
+        .orderBy("orden","asc")
         .where("idcategoria", req.params.idCategoria)
         .then((resp) => res.send(resp));
 };
