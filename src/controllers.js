@@ -103,6 +103,7 @@ exports.getPuntoMuestralByIdMesa = (req, res) => {
 
             return knex("categoria")
                 .select("*")
+                .orderBy("ordenCategoria","asc")
                 .whereNotIn("id", categoriasArray)
                 .then((resp) => res.send(resp));
         })
