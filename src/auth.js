@@ -26,14 +26,12 @@ exports.login = (req, res) => {
 
 function generateHash(password) {
     bcrypt.hash(password, 6, function (err, hash) {
-        console.log("generateHash", err, hash);
     });
 }
 
 function comparePassword(plaintextPassword, hash) {
     return bcrypt.compare(plaintextPassword, hash)
         .then(result => {
-            console.log("comparePassword", result, plaintextPassword, hash);
             return result
         })
         .catch(err => {
