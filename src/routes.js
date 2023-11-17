@@ -1,6 +1,8 @@
 const controllers = require("./controllers");
+const auth = require("./auth");
 
 module.exports = (app) => {
+    app.post("/login", auth.login);
     app.post("/punto_muestral/:celular", controllers.postPuntoMuestral);
     app.get("/punto_muestral/:celular", controllers.getPuntoMuestral);
     app.get("/punto_muestral/:idPuntoMuestral/mesas", controllers.getPuntoMuestralByIdPuntoMuestral);

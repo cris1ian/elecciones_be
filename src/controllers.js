@@ -23,10 +23,6 @@ const upload = multer({
     }),
 });
 
-/**
- * Arrancan endpoints
- */
-
 exports.getPuntoMuestral = (req, res) => {
     const celular = req.params ? req.params.celular : null;
 
@@ -103,7 +99,7 @@ exports.getPuntoMuestralByIdMesa = (req, res) => {
 
             return knex("categoria")
                 .select("*")
-                .orderBy("ordenCategoria","asc")
+                .orderBy("ordenCategoria", "asc")
                 .whereNotIn("id", categoriasArray)
                 .then((resp) => res.send(resp));
         })
@@ -116,7 +112,7 @@ exports.getPuntoMuestralByIdMesa = (req, res) => {
 exports.getCategorias = (req, res) => {
     return knex("categoria")
         .select("*")
-        .orderBy("ordenCategoria","asc")
+        .orderBy("ordenCategoria", "asc")
         .then((resp) => res.send(resp))
         .catch((err) => res.status(500).send(err));
 };
@@ -133,7 +129,7 @@ exports.getMesas = (req, res) => {
 exports.getCategoriaById = (req, res) => {
     return knex("candidato")
         .select("*")
-        .orderBy("orden","asc")
+        .orderBy("orden", "asc")
         .where("idcategoria", req.params.idCategoria)
         .then((resp) => res.send(resp));
 };
