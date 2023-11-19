@@ -20,4 +20,5 @@ module.exports = (app) => {
     app.get("/localidad", controllers.getLocalidad);
 
     app.get("/comparativa", controllers.getComparativa);
+    app.get("/circuitos", controllers.getCircuitos);
 };

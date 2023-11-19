@@ -34,8 +34,7 @@ exports.getPuntoMuestral = (req, res) => {
             .then((resp) => res.send(resp))
             .catch((err) => {
                 console.log("Celular:" + celular);
-                console.log("ERROR");
-                console.log(err);
+                console.log("ERROR", err);
             });
     } else {
         return knex("mesa")
@@ -123,6 +122,7 @@ exports.getCategorias = (req, res) => {
 exports.getMesas = (req, res) => {
     return knex("mesa")
         .select("*")
+        .orderBy("descripcion", "asc")
         .then((resp) => res.send(resp));
 };
 
@@ -212,19 +212,77 @@ exports.getLocalidad = (req, res) => {
         .whereNotNull("localidad")
         .then((resp) => res.send(resp.map((e) => e.localidad)))
         .catch((err) => {
-            console.log("ERROR");
-            console.log(err);
+            console.log("ERROR", err);
         });
 };
 
-
 exports.getComparativa = (req, res) => {
+    const circuitoArray = req.query.circuito.split(',');
+
     return knex("vista_comparativa")
         .select("*")
-        .then((resp) => res.send(resp))
+        .whereIn("circuito", circuitoArray)
+        .orderBy("circuito", "asc")
+        .then((resp) => {
+            console.log("resp", resp);
+            return res.send(procesarData(resp));
+        })
         .catch((err) => {
-            console.log("ERROR");
-            console.log(err);
+            console.log("ERROR", err);
             res.status(500).send("Internal Server Error");
         });
 };
+
+exports.getCircuitos = (req, res) => {
+    return knex("circuito")
+        .select("*")
+        .where({ consultar: true, })
+        .orderBy("descripcion", "asc")
+        .then((resp) => res.send(resp))
+        .catch((err) => {
+            console.log("ERROR", err);
+            res.status(500).send("Internal Server Error");
+        });
+};
+
+const procesarData = (_data) => {
+    const labels = obtenerDataSet(_data, "massa", true, true);
+
+    const reference = [
+        {
+            label: "Massa Gen",
+            data: obtenerDataSet(_data, "massa", true),
+            backgroundColor: '#0f7ca3'
+        },
+        {
+            label: "Massa Bal",
+            data: obtenerDataSet(_data, "massa", false),
+            backgroundColor: '#37bbed'
+        },
+        {
+            label: "Milei Gen",
+            data: obtenerDataSet(_data, "milei", true),
+            backgroundColor: '#d100a4'
+        },
+        {
+            label: "Milei Bal",
+            data: obtenerDataSet(_data, "milei", false),
+            backgroundColor: '#FF00C8'
+        }
+    ];
+
+    return { dataset: reference, labels: labels }
+}
+
+const obtenerDataSet = (data, candidato, isGeneral, isLabel = false) => {
+
+    const filteredData = data.filter((elem) => {
+        const includesGeneral = elem.descripcion?.toLowerCase().includes('eneral');
+        const includesCandidato = elem.nombre_candidato?.toLowerCase().includes(candidato);
+
+        return includesCandidato && (isGeneral ? includesGeneral : !includesGeneral)
+    });
+
+    return filteredData.map((elem) => `${isLabel ? elem.circuito : elem.cantidadvotos}`)
+
+}
