@@ -205,6 +205,7 @@ exports.getAdmin = (req, res) => {
 };
 
 exports.getLocalidad = (req, res) => {
+
     return knex("punto_muestral")
         .select("localidad")
         .distinct()
@@ -213,5 +214,17 @@ exports.getLocalidad = (req, res) => {
         .catch((err) => {
             console.log("ERROR");
             console.log(err);
+        });
+};
+
+
+exports.getComparativa = (req, res) => {
+    return knex("vista_comparativa")
+        .select("*")
+        .then((resp) => res.send(resp))
+        .catch((err) => {
+            console.log("ERROR");
+            console.log(err);
+            res.status(500).send("Internal Server Error");
         });
 };

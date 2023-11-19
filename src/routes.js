@@ -18,4 +18,6 @@ module.exports = (app) => {
     app.get("/puntos-informados/:idCategoria", controllers.getPuntos);
     app.get("/admin-sp/:spName", controllers.getAdmin);
     app.get("/localidad", controllers.getLocalidad);
+
+    app.get("/comparativa", controllers.getComparativa);
 };
