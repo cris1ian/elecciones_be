@@ -65,6 +65,7 @@ exports.postPuntoMuestral = (req, res) => {
 exports.getPuntoMuestralByIdPuntoMuestral = (req, res) => {
     return knex("mesa")
         .select("*")
+        .orderBy("descripcion", "asc")
         .where("idpuntomuestral", req.params.idPuntoMuestral)
         .then((resp) => res.send(resp));
 };
